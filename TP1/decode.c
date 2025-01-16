@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 typedef struct instruction {
-    unsigned char inst_ASM[5];
+    unsigned char * inst_ASM;
     short int code_op;
     short int taille;
     short int nb_operande;
@@ -11,14 +11,20 @@ typedef struct instruction {
 } instruction_t;
 
 instruction_t donnee[20];
-donnee[0].inst_asm = "NOP";
 
 int
-main()
+init()
 {
-    printf("%s\n", donnee[0].code_op);
+    /* première instruction */
+    donnee[0] = {"NOP", 00000000, 8, 0, 0, 0};
     return 0;
 }
 
+void
+main()
+{
+    int i = init();
+    printf("%hhn\n", donnee[0].inst_ASM);
+}
 
 /* 0100 1010 0000 0000 0000 0001 */
