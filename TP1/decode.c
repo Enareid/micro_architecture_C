@@ -7,11 +7,12 @@ instruction_t *
 decode_instruction(int instruction, int taille)
 {
     int nb_instructions = sizeof(instructions)/sizeof(instructions[0]);
+    int nb_instructions_restantes = sizeof(instructions)/sizeof(instructions[0]);
     instruction_t * res;
     res = NULL;
 	int i, j;
     j = taille;
-    while (nb_instructions != 1) {
+    while (nb_instructions_restantes != 1) {
         for(i = 0; i < nb_instructions; i++) {
             if (instructions[i].use) {
                 for (int s = instructions[i].taille_code_op - 1; s >= 0; s--) {
@@ -25,11 +26,11 @@ decode_instruction(int instruction, int taille)
             }
             j = taille;
             if (instructions[i].use == 0) {
-                nb_instructions--;
+                nb_instructions_restantes--;
             }
         }
     }    
-	for (i=0;i<17;i++){
+	for (i=0;i<nb_instructions;i++){
         if (instructions[i].use){
             res = instructions+i;
         }
