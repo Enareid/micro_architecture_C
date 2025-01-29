@@ -1,37 +1,61 @@
-#include "instructions.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "instructions.h"
 
-instruction_t *
-decode_instruction(short int code)
+instruction_t * 
+decode_instruction(int instruction, int taille)
 {
-    int i;
-    for (i = 0; i < 18; i++) {
-        short int masked_code = code & ((1 << instructions[i].taille) - 1);
-        if (masked_code == instructions[i].code_op) {
-            return &instructions[i];
+    int nb_instructions = sizeof(instructions)/sizeof(instructions[0]);
+    instruction_t * res;
+    res = NULL;
+	int i, j;
+    j = taille;
+    while (nb_instructions != 1) {
+        for(i = 0; i < nb_instructions; i++) {
+            if (instructions[i].use) {
+                for (int s = instructions[i].taille_code_op - 1; s >= 0; s--) {
+                    int code_sieme_bit = (((instructions[i].code_op)>>s)&1);
+				    int instruction_jieme_bit = (((instruction)>>j)&1);
+                    if (code_sieme_bit != instruction_jieme_bit) {
+                        instructions[i].use = 0;
+                    }
+                    j--;
+                }
+            }
+            j = taille;
+            if (instructions[i].use == 0) {
+                nb_instructions--;
+            }
         }
-    }
-    return NULL;
+    }    
+	for (i=0;i<17;i++){
+        if (instructions[i].use){
+            res = instructions+i;
+        }
+        instructions[i].use = 1;
+	}
+	return res;
 }
 
-int
-main(argc, argv)
-    int argc;
-    char ** argv;
+void
+decode(int instruction, int taille){
+    instruction_t * inst = decode_instruction(instruction, taille);
+
+}
+
+int 
+main(int argc, char *argv[])
 {
-    if (argc != 2) {
-        printf("Usage: %s <code_op>\n", argv[0]);
-        return 1;
+    
+    int taille = strlen(argv[1])*4;
+    int instruction = strtol(argv[1], NULL, 16);
+    instruction_t * res = decode_instruction(instruction, taille-1);
+    if (res == NULL){
+        printf("Instruction non reconnue\n");
     }
-    short int code = atoi(argv[1]);
-    instruction_t * inst = decode_instruction(code);
-    if (inst != NULL) {
-        printf("Instruction trouvée: %s\n", inst->inst_ASM);
-        printf("Code opératoire: %d\n", inst->code_op);
-        printf("Nombre d'opérandes: %d\n", inst->nb_operande);
-    }
-    else {
-        printf("Instruction non trouvée\n");
+    else{
+        printf("Instruction reconnue : %s\n", res->inst_ASM);
     }
     return 0;
 }
