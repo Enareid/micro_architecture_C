@@ -3,7 +3,9 @@
 #include <string.h>
 #include "instructions.h"
 
-instruction_t * 
+struct proc * CPU;
+
+void 
 decode_instruction(int instruction, int taille)
 {
     int nb_instructions = sizeof(instructions)/sizeof(instructions[0]);
@@ -32,17 +34,12 @@ decode_instruction(int instruction, int taille)
     }    
 	for (i=0;i<nb_instructions;i++){
         if (instructions[i].use){
-            res = instructions+i;
+            CPU -
+            printf("Instruction reconnue : %d\n", instructions[i].code_op);
         }
         instructions[i].use = 1;
 	}
 	return res;
-}
-
-void
-decode(int instruction, int taille){
-    instruction_t * inst = decode_instruction(instruction, taille);
-
 }
 
 int 
@@ -51,12 +48,6 @@ main(int argc, char *argv[])
     
     int taille = strlen(argv[1])*4;
     int instruction = strtol(argv[1], NULL, 16);
-    instruction_t * res = decode_instruction(instruction, taille-1);
-    if (res == NULL){
-        printf("Instruction non reconnue\n");
-    }
-    else{
-        printf("Instruction reconnue : %s\n", res->inst_ASM);
-    }
+    decode_instruction(instruction, taille-1);
     return 0;
 }
