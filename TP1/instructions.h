@@ -14,7 +14,7 @@
 
 typedef struct instruction {
     char * inst_ASM;
-    int code_op;
+    uint8_t code_op;
     int taille_code_op;
     int nb_operande;
     int type_op1;
@@ -32,7 +32,7 @@ struct registre {
 };
 
 
-struct proc {
+typedef struct proc {
     uint8_t RAM[RAM_SIZE];
     struct registre registre;
     uint8_t RI;
@@ -40,6 +40,8 @@ struct proc {
     uint8_t adresse_latch;
     uint8_t adresse_bus;
     uint8_t data_bus;
-};
+} proc_t;
+
+extern proc_t * CPU;
 
 #endif
