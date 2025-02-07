@@ -25,6 +25,4 @@ extern CPU_t CPU;
 
 void init_CPU();
 
-void free_CPU();
-
 #endif

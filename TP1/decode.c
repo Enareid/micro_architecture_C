@@ -100,6 +100,5 @@ main(int argc, char *argv[]) {
             printf("%04X: %02X\n", i, CPU.RAM[i]);
         }
     }
-
     return 0;
 }

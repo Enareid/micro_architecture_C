@@ -1,5 +1,6 @@
 #include "cpu.h"
 #include <string.h>
+#include <stdlib.h>
 
 CPU_t CPU;
 
@@ -16,10 +17,4 @@ init_CPU()
     for (int i = 0; i < NB_REGITRE; i++) {
         CPU.registre.registre[i] = 0;
     }
-}
-
-void
-free_CPU()
-{
-    free(&CPU);
 }
