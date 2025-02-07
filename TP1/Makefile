@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-OBJ = decode.o instructions.o
+OBJ = decode.o instructions.o cpu.o
 
 all: simulateur
 
@@ -12,6 +12,9 @@ decode.o: decode.c instructions.h
 
 instructions.o: instructions.c instructions.h
 	$(CC) $(CFLAGS) -c instructions.c
+
+cpu.o: cpu.c cpu.h
+	$(CC) $(CFLAGS) -c cpu.c	
 
 clean:
 	rm -f $(OBJ) simulateur

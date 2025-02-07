@@ -9,8 +9,6 @@
 #define adresse 1
 #define reg 2
 #define valeur 3
-#define RAM_SIZE 2048
-#define NB_REGITRE 8
 
 typedef struct instruction {
     char * inst_ASM;
@@ -26,22 +24,5 @@ typedef struct instruction {
 
 extern instruction_t instructions[17];
 
-struct registre {
-    int index;
-    uint8_t registre[NB_REGITRE];
-};
-
-
-typedef struct proc {
-    uint8_t RAM[RAM_SIZE];
-    struct registre registre;
-    uint8_t RI;
-    uint8_t PC;
-    uint8_t adresse_latch;
-    uint8_t adresse_bus;
-    uint8_t data_bus;
-} proc_t;
-
-extern proc_t * CPU;
 
 #endif

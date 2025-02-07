@@ -21,6 +21,5 @@ instruction_t instructions[17] = {
     {"MV", 0b00, 2, 2, reg, 3, reg, 3, 1} /* Charge dans le reg Rn (premier opérande) la valeur du reg Rm (second opérande) */
 };
 
-proc_t * CPU;
 
 /* 4A 00 01 => 01001[LD] 010[R2] 0000000000000001[0001h] => LD R2, 0001h */
