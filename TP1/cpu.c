@@ -9,6 +9,8 @@ init_CPU()
 {
     memset(&CPU, 0, sizeof(CPU_t));
     CPU.PC = 0;
+    CPU.PCH = 0;
+    CPU.PCI = 0;
     CPU.adresse_latch = 0;
     CPU.adresse_bus = 0;
     CPU.data_bus = 0;
@@ -17,4 +19,7 @@ init_CPU()
     for (int i = 0; i < NB_REGITRE; i++) {
         CPU.registre.registre[i] = 0;
     }
+    CPU.alu.X = 0;
+    CPU.alu.Y = 0;
+    CPU.alu.res = 0;
 }

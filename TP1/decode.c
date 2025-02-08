@@ -3,6 +3,7 @@
 #include <string.h>
 #include "instructions.h"
 #include "cpu.h"
+#include "function.c"
 
 void 
 decode_instruction(int instruction, int taille)
@@ -53,6 +54,8 @@ load_instructions(const char *filename) {
         unsigned int address;
         int values[3];
         int count = sscanf(line, "%x: %x %x %x", &address, &values[0], &values[1], &values[2]);
+        printf("value %d", values[1]);
+        decode_instruction(values[0], 7);
         if (count >= 2) { // Minimum : une adresse et une valeur
             for (int i = 0; i < count - 1; i++) {
                 if (address + i < RAM_SIZE) {
@@ -65,26 +68,6 @@ load_instructions(const char *filename) {
     fclose(file);
 }
 
-/*
-int 
-main(int argc, char *argv[])
-{
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s instruction\n", argv[0]);
-        exit(1);
-    }
-    CPU = malloc(sizeof(proc_t));
-    if (!CPU) {
-        perror("malloc");
-        exit(1);
-    }
-    int taille = strlen(argv[1])*4;
-    int instruction = strtol(argv[1], NULL, 16);
-    decode_instruction(instruction, taille-1);
-    free(CPU);
-    return 0;
-}
-*/
 
 int 
 main(int argc, char *argv[]) {
@@ -102,3 +85,15 @@ main(int argc, char *argv[]) {
     }
     return 0;
 }
+
+/*
+int 
+main()
+{
+    CPU.registre.registre[0] = -5;
+    CPU.registre.registre[1] = -10;
+    ADD(0,1);
+    printf("%d\n", CPU.registre.registre[1]);
+    return 0;
+}
+    */
