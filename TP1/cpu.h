@@ -30,10 +30,11 @@ typedef struct {
     uint8_t RI;
     uint16_t PC;
     uint8_t PCH;
-    uint8_t PCI;
-    uint8_t adresse_latch;
+    uint8_t PCL;
+    uint16_t adresse_latch;
     uint16_t adresse_bus;
     uint8_t data_bus;
+    uint8_t DLatch;
     struct ALU alu;
 } CPU_t;
 

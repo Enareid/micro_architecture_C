@@ -1,13 +1,78 @@
 #include "cpu.h"
 
 void 
-PCin()
+AAout()
 {
-    CPU.PC = CPU.adresse_bus;
-    CPU.PCH = 
+    CPU.adresse_latch = CPU.adresse_latch + 1;
 }
 
 void
+DLout()
+{
+    CPU.data_bus = CPU.DLatch;
+}
+
+void
+DLin()
+{
+    CPU.DLatch = CPU.data_bus;
+}
+
+void 
+PCin()
+{
+    CPU.PC = CPU.adresse_bus;
+    CPU.PCH = (CPU.PC >> 8) & 0xFF;  // Récupère les 8 bits de poids fort
+    CPU.PCL = CPU.PC & 0xFF;         // Récupère les 8 bits de poids faible
+}
+
+void
+PCout()
+{
+    CPU.adresse_bus = CPU.PC;
+}
+
+void 
+PCHin()
+{
+    CPU.PCH = CPU.data_bus;
+}
+
+void 
+PCLin()
+{
+    CPU.PCL = CPU.data_bus;
+}
+
+void
+ALin()
+{
+    CPU.adresse_latch = CPU.adresse_bus;
+}
+
+void
+Read()
+{
+    CPU.DLatch = CPU.RAM[CPU.adresse_latch];
+}
+
+void
+Write()
+{
+    CPU.RAM[CPU.adresse_latch] = CPU.DLatch;
+}
+
+void
+RepX()
+{
+    CPU.alu.res = CPU.alu.X;
+}
+
+void 
+RepY()
+{
+    CPU.alu.res = CPU.alu.Y;
+}
 
 void
 Xin()
@@ -68,9 +133,19 @@ soustraction()
 }
 
 void
-JMP(uint8_t i, uint8_t j)
+JMP()
 {
-    
+    Read();
+    DLout();
+    Xin();
+    AAout();
+    ALin();
+    Read();
+    DLout();
+    PCHin();
+    RepX();
+    ALUout();
+    PCLin();
 }
 
 void

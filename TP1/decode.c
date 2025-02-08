@@ -54,7 +54,6 @@ load_instructions(const char *filename) {
         unsigned int address;
         int values[3];
         int count = sscanf(line, "%x: %x %x %x", &address, &values[0], &values[1], &values[2]);
-        printf("value %d", values[1]);
         decode_instruction(values[0], 7);
         if (count >= 2) { // Minimum : une adresse et une valeur
             for (int i = 0; i < count - 1; i++) {
@@ -77,23 +76,8 @@ main(int argc, char *argv[]) {
     }
     load_instructions(argv[1]);
 
-    // Exemple d'affichage du contenu de la mémoire après chargement
-    for (int i = 0; i < RAM_SIZE; i++) {
-        if (CPU.RAM[i] != 0) {
-            printf("%04X: %02X\n", i, CPU.RAM[i]);
-        }
-    }
+    CPU.adresse_latch = 0x0200;
+    Read();
+    printf("Valeur lue : %d\n", CPU.data_bus);
     return 0;
 }
-
-/*
-int 
-main()
-{
-    CPU.registre.registre[0] = -5;
-    CPU.registre.registre[1] = -10;
-    ADD(0,1);
-    printf("%d\n", CPU.registre.registre[1]);
-    return 0;
-}
-    */
