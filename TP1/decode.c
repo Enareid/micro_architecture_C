@@ -77,7 +77,4 @@ main(int argc, char *argv[]) {
     load_instructions(argv[1]);
 
     CPU.adresse_latch = 0x0200;
-    Read();
-    printf("Valeur lue : %d\n", CPU.data_bus);
-    return 0;
 }

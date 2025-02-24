@@ -35,13 +35,13 @@ PCout()
 void 
 PCHin()
 {
-    CPU.PCH = CPU.data_bus;
+    CPU.PCH = (CPU.PC & 0x00FF) | (CPU.data_bus << 8);
 }
 
 void 
 PCLin()
 {
-    CPU.PCL = CPU.data_bus;
+    CPU.PCL = (CPU.PC & 0xFF00) | CPU.data_bus;
 }
 
 void
@@ -176,4 +176,59 @@ SUB(uint8_t i, uint8_t j)
     ALUout();
     SR(j);
     Rin();
+}
+
+void
+LD(uint8_t i)
+{
+    Read();
+    DLout();
+    Xin();
+    AAout();
+    ALin();
+    Read();
+    AAout();
+    PCin();
+    DLout();
+    ALin();
+    RepX();
+    ALUout();
+    ALin();
+    Read();
+    DLout();
+    SR(i);
+    Rin();
+}
+
+void
+DEC(uint8_t i)
+{
+    SR(i);
+    Rout();
+    Xin();
+    CPU.alu.Y = 1;
+    soustraction();
+    ALUout();
+    SR(i);
+    Rin();
+}
+
+void
+INC(uint8_t i)
+{
+    SR(i);
+    Rout();
+    Xin();
+    CPU.alu.Y = 1;
+    addition();
+    ALUout();
+    SR(i);
+    Rin();
+}
+
+void
+JZ()
+{
+    if (CPU.alu.res == 0)
+        JMP();
 }
