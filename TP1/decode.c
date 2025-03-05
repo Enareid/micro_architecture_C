@@ -5,14 +5,15 @@
 #include "cpu.h"
 #include "function.c"
 
-void 
+int
 decode_instruction(int instruction, int taille)
 {
     int nb_instructions = sizeof(instructions)/sizeof(instructions[0]);
     int nb_instructions_restantes = sizeof(instructions)/sizeof(instructions[0]);
 	int i, j;
+    uint8_t res;
     j = taille;
-    while (nb_instructions_restantes != 1) {
+    while (nb_instructions_restantes != 1 && instruction != 0) {
         for(i = 0; i < nb_instructions; i++) {
             if (instructions[i].use) {
                 for (int s = instructions[i].taille_code_op - 1; s >= 0; s--) {
@@ -32,12 +33,12 @@ decode_instruction(int instruction, int taille)
     }    
 	for (i=0;i<nb_instructions;i++){
         if (instructions[i].use){
-            printf("Instruction reconnue : %s\n", instructions[i].inst_ASM);
-            CPU.RI = instructions[i].code_op;
-            printf("Code opération : %d\n", CPU.RI);
+            res = instructions[i].code_op;
         }
         instructions[i].use = 1;
 	}
+    next_addr();
+    return res;
 }
 
 
@@ -48,13 +49,12 @@ load_instructions(const char *filename) {
         perror("Erreur ouverture fichier");
         exit(EXIT_FAILURE);
     }
-
+    int indice = 0;
     char line[256];
     while (fgets(line, sizeof(line), file)) {
         unsigned int address;
         int values[3];
         int count = sscanf(line, "%x: %x %x %x", &address, &values[0], &values[1], &values[2]);
-        decode_instruction(values[0], 7);
         if (count >= 2) { // Minimum : une adresse et une valeur
             for (int i = 0; i < count - 1; i++) {
                 if (address + i < RAM_SIZE) {
@@ -62,11 +62,61 @@ load_instructions(const char *filename) {
                 }
             }
         }
+        if (indice == 0) {
+            CPU.RI = values[0];
+            CPU.adresse_latch = address;
+        }
+        indice++;
     }
-
     fclose(file);
 }
 
+void
+execute()
+{
+    printf("Execute\n");
+    int instruction = decode_instruction(CPU.RI, 7);
+    while(CPU.RI != 0) {
+        switch(instruction) {
+            case 0b01001:
+                LD(1);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01010:
+                MV(CPU.RI & 0x03);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b100:
+                ADD((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01110001:
+                JZ();
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01011:
+                DEC(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01100:
+                INC(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01110000:
+                JMP();
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+        }
+    }
+    printf("Execution terminée\n");
+}
 
 int 
 main(int argc, char *argv[]) {
@@ -75,6 +125,9 @@ main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     load_instructions(argv[1]);
-
-    CPU.adresse_latch = 0x0200;
+    printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
+    printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
+    execute();
+    printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
+    printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
 }

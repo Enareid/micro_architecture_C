@@ -3,7 +3,7 @@
 void 
 AAout()
 {
-    CPU.adresse_latch = CPU.adresse_latch + 1;
+    CPU.adresse_bus = CPU.adresse_latch + 1;
 }
 
 void
@@ -35,7 +35,7 @@ PCout()
 void 
 PCHin()
 {
-    CPU.PCH = (CPU.PC & 0x00FF) | (CPU.data_bus << 8);
+    CPU.PCH = CPU.data_bus;
 }
 
 void 
@@ -119,17 +119,38 @@ ALUout()
 void
 addition()
 {
+    CPU.alu.flags = 0; // Réinitialise les flags
     if (CPU.alu.X + CPU.alu.Y > 255 || CPU.alu.X + CPU.alu.Y < 0)
         CPU.alu.flags = DEBORDEMENT;
+    if (CPU.alu.X + CPU.alu.Y == 0) {
+        CPU.alu.flags = NUL;
+    }
     CPU.alu.res = CPU.alu.X + CPU.alu.Y;
 }
 
 void
 soustraction()
 {
-    if (CPU.alu.X + CPU.alu.Y > 255 || CPU.alu.X + CPU.alu.Y < 0)
+    CPU.alu.flags = 0; // Réinitialise les flags
+    if (CPU.alu.X - CPU.alu.Y > 255 || CPU.alu.X - CPU.alu.Y < 0)
         CPU.alu.flags = DEBORDEMENT;
+    if (CPU.alu.X - CPU.alu.Y == 0) {
+        CPU.alu.flags = NUL;
+    }
     CPU.alu.res = CPU.alu.X - CPU.alu.Y;
+}
+
+void
+next_addr()
+{
+    AAout();
+    ALin();
+}
+
+void
+update_pc()
+{
+    CPU.PC = (CPU.PCH << 8) | CPU.PCL;
 }
 
 void
@@ -142,10 +163,23 @@ JMP()
     ALin();
     Read();
     DLout();
-    PCHin();
+    PCLin();
     RepX();
     ALUout();
-    PCLin();
+    PCHin();
+    update_pc();
+}
+
+void
+JZ()
+{
+    if (CPU.alu.flags == NUL){
+        JMP();
+    }
+    else {
+        next_instru();
+        next_instru();
+    }
 }
 
 void
@@ -159,7 +193,7 @@ ADD(uint8_t i, uint8_t j)
     Yin();
     addition();
     ALUout();
-    SR(j);
+    SR(i);
     Rin();
 }
 
@@ -226,9 +260,25 @@ INC(uint8_t i)
     Rin();
 }
 
-void
-JZ()
+void 
+MV(uint8_t i)
 {
-    if (CPU.alu.res == 0)
-        JMP();
+    Read();
+    AAout();
+    PCin();
+    DLout();
+    SR(i);
+    Rin();
+}
+
+void
+next_instru()
+{
+    PCout();
+    ALin();
+    Read();
+    AAout();
+    PCin();
+    DLout();
+    IRin();
 }

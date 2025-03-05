@@ -7,6 +7,7 @@
 #define NB_REGITRE 8
 
 #define DEBORDEMENT 1
+#define NUL 2
 
 struct registre {
     int index;

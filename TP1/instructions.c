@@ -1,7 +1,7 @@
 #include "instructions.h"
 
-instruction_t instructions[17] = {
-    /* {"NOP", 0b00000000, 8, 0, 0, 0, 1}, Ne fait rien */
+instruction_t instructions[18] = {
+    {"NOP", 0b00000000, 8, 0, nul, 0, nul, 0, 1}, /* Ne fait rien */
     {"JMP", 0b01110000, 8, 1, adresse, 16, nul, 0, 1}, /* Effectue un branchement a l'adresse codée sur 16 bits */
     {"JZ", 0b01110001, 8, 1, adresse, 16, nul, 0, 1}, /* Effectue un saut a l'adresse 16 bit si l'opération précédente à donné un résultat nul */
     {"JC", 0b01110010, 8, 1, adresse, 16, nul, 0, 1}, /* Effectue un saut à l'adresse 16 bit si l'opération précédente à engendré une retenue */
