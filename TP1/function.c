@@ -51,6 +51,18 @@ ALin()
 }
 
 void
+ALLin()
+{
+    CPU.adresse_latch = CPU.adresse_bus;
+}
+
+void
+ALHin()
+{
+    CPU.adresse_latch = (CPU.adresse_latch & 0xFF) | (CPU.data_bus << 8);
+}
+
+void
 Read()
 {
     CPU.DLatch = CPU.RAM[CPU.adresse_latch];
@@ -183,33 +195,79 @@ JZ()
 }
 
 void
-ADD(uint8_t i, uint8_t j)
+JC()
 {
-    SR(j);
+    if (CPU.alu.flags == DEBORDEMENT){
+        JMP();
+    }
+    else {
+        next_instru();
+        next_instru();
+    }
+}
+
+void
+JMP2(uint8_t i)
+{
+    SR(i*2);
     Rout();
-    Xin();
-    SR(i);
+    PCLin();
+    SR(i*2+1);
     Rout();
-    Yin();
-    addition();
-    ALUout();
-    SR(i);
+    PCHin();
+    update_pc();
+}
+
+void
+ST2(uint8_t i)
+{
+    SR(i*2);
+    Rout();
+    ALLin();
+    SR(i*2+1);
+    Rout();
+    ALHin();
+    SR(0);
+    Rout();
+    DLin();
+    Write();
+}
+
+void
+LD2(uint8_t i)
+{
+    SR(i*2);
+    Rout();
+    ALLin();
+    SR(i*2+1);
+    Rout();
+    ALHin();
+    Read();
+    SR(0);
+    DLout();
     Rin();
 }
 
 void
-SUB(uint8_t i, uint8_t j)
+ST(uint8_t i)
 {
-    SR(j);
-    Rout();
+    Read();
+    DLout();
     Xin();
+    AAout();
+    ALin();
+    Read();
+    AAout();
+    PCin();
+    DLout();
+    ALHin();
+    RepX();
+    ALUout();
+    ALLin();
+    update_pc();
     SR(i);
     Rout();
-    Yin();
-    soustraction();
-    ALUout();
-    SR(j);
-    Rin();
+    Write();
 }
 
 void
@@ -229,6 +287,17 @@ LD(uint8_t i)
     ALUout();
     ALin();
     Read();
+    DLout();
+    SR(i);
+    Rin();
+}
+
+void 
+MV(uint8_t i)
+{
+    Read();
+    AAout();
+    PCin();
     DLout();
     SR(i);
     Rin();
@@ -260,14 +329,86 @@ INC(uint8_t i)
     Rin();
 }
 
-void 
-MV(uint8_t i)
+void
+NOT(uint8_t i)
 {
-    Read();
-    AAout();
-    PCin();
-    DLout();
     SR(i);
+    Rout();
+    Xin();
+    CPU.alu.Y = 0xFF;
+    CPU.alu.X = CPU.alu.res;
+    soustraction();
+    ALUout();
+    SR(i);
+    Rin();
+}
+
+void
+ADD(uint8_t i, uint8_t j)
+{
+    SR(j);
+    Rout();
+    Xin();
+    SR(i);
+    Rout();
+    Yin();
+    addition();
+    ALUout();
+    SR(i);
+    Rin();
+}
+
+void
+SUB(uint8_t i, uint8_t j)
+{
+    SR(j);
+    Rout();
+    Xin();
+    SR(i);
+    Rout();
+    Yin();
+    soustraction();
+    ALUout();
+    SR(j);
+    Rin();
+}
+
+void
+AND(uint8_t i, uint8_t j)
+{
+    SR(j);
+    Rout();
+    Xin();
+    SR(i);
+    Rout();
+    CPU.alu.res = CPU.alu.X & CPU.alu.Y;
+    ALUout();
+    SR(i);
+    Rin();
+}
+
+void
+MV2(uint8_t i, uint8_t j)
+{
+    SR(j);
+    Rout();
+    Xin();
+    SR(i);
+    Rin();
+}
+
+void
+SWP(uint8_t i, uint8_t j)
+{
+    SR(j);
+    Rout();
+    Xin();
+    SR(i);
+    Rout();
+    SR(j);
+    Rin();
+    SR(i);
+    RepX();
     Rin();
 }
 
