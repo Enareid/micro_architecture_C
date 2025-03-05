@@ -78,13 +78,18 @@ execute()
     int instruction = decode_instruction(CPU.RI, 7);
     while(CPU.RI != 0) {
         switch(instruction) {
-            case 0b01001:
-                LD(1);
+            case 0b111:
+                SWP((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
-            case 0b01010:
-                MV(CPU.RI & 0x03);
+            case 0b110:
+                AND((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b101:
+                SUB((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
@@ -93,8 +98,13 @@ execute()
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
-            case 0b01110001:
-                JZ();
+            case 0b01101:
+                NOT(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01100:
+                INC(CPU.RI & 0x07);
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
@@ -103,8 +113,43 @@ execute()
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
-            case 0b01100:
-                INC(CPU.RI & 0x07);
+            case 0b01010:
+                MV(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01001:
+                LD(1);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01000:
+                ST(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b011111:
+                LD2(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b011110:
+                ST2(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01110011:
+                JMP2(CPU.RI & 0x07);
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01110010:
+                JC();
+                next_instru();
+                instruction = decode_instruction(CPU.RI, 7);
+                break;
+            case 0b01110001:
+                JZ();
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
