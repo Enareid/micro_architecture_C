@@ -53,13 +53,13 @@ ALin()
 void
 ALLin()
 {
-    CPU.adresse_latch = CPU.adresse_bus;
+    CPU.ALL = (CPU.adresse_latch & 0xFF00) | CPU.data_bus;
 }
 
 void
 ALHin()
 {
-    CPU.adresse_latch = (CPU.adresse_latch & 0xFF) | (CPU.data_bus << 8);
+    CPU.ALH = CPU.data_bus;
 }
 
 void
@@ -166,6 +166,12 @@ update_pc()
 }
 
 void
+update_al()
+{
+    CPU.adresse_latch = (CPU.ALL << 8) | CPU.ALH;
+}
+
+void
 JMP()
 {
     Read();
@@ -257,17 +263,23 @@ ST(uint8_t i)
     AAout();
     ALin();
     Read();
+    DLout();
+    Yin();
     AAout();
     PCin();
-    DLout();
-    ALHin();
     RepX();
     ALUout();
     ALLin();
-    update_pc();
+    RepY();
+    ALUout();
+    ALHin();
+    update_al();
     SR(i);
     Rout();
+    DLin();
     Write();
+    PCout();
+    ALin();
 }
 
 void
@@ -279,17 +291,23 @@ LD(uint8_t i)
     AAout();
     ALin();
     Read();
+    DLout();
+    Yin();
     AAout();
     PCin();
-    DLout();
-    ALin();
     RepX();
     ALUout();
-    ALin();
+    ALLin();
+    RepY();
+    ALUout();
+    ALHin();
+    update_al();
     Read();
     DLout();
     SR(i);
     Rin();
+    PCout();
+    ALin();
 }
 
 void 

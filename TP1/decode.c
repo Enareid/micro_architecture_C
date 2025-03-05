@@ -77,6 +77,8 @@ execute()
     printf("Execute\n");
     int instruction = decode_instruction(CPU.RI, 7);
     while(CPU.RI != 0) {
+        printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
+        printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
         switch(instruction) {
             case 0b111:
                 SWP((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
@@ -119,7 +121,7 @@ execute()
                 instruction = decode_instruction(CPU.RI, 7);
                 break;
             case 0b01001:
-                LD(1);
+                LD(CPU.RI & 0x07);
                 next_instru();
                 instruction = decode_instruction(CPU.RI, 7);
                 break;

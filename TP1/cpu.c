@@ -13,6 +13,8 @@ init_CPU()
     CPU.PCL = 0;
     CPU.adresse_latch = 0;
     CPU.adresse_bus = 0;
+    CPU.ALL = 0;
+    CPU.ALH = 0;
     CPU.data_bus = 0;
     CPU.DLatch = 0;
     CPU.RI = 0;

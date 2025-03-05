@@ -33,6 +33,8 @@ typedef struct {
     uint8_t PCH;
     uint8_t PCL;
     uint16_t adresse_latch;
+    uint8_t ALL;
+    uint8_t ALH;
     uint16_t adresse_bus;
     uint8_t data_bus;
     uint8_t DLatch;
