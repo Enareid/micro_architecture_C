@@ -23,7 +23,6 @@ struct ALU {
     uint8_t flags;
 };
 
-/* rajouter les flags pour éviter les débordement des oppérations */
 
 typedef struct {
     uint8_t RAM[RAM_SIZE];

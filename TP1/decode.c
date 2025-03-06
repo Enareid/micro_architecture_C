@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #include "instructions.h"
 #include "cpu.h"
 #include "function.c"
 
-int
+instruction_t
 decode_instruction(int instruction, int taille)
 {
     int nb_instructions = sizeof(instructions)/sizeof(instructions[0]);
     int nb_instructions_restantes = sizeof(instructions)/sizeof(instructions[0]);
 	int i, j;
-    uint8_t res;
+    instruction_t res;
     j = taille;
     while (nb_instructions_restantes != 1 && instruction != 0) {
         for(i = 0; i < nb_instructions; i++) {
@@ -33,7 +34,7 @@ decode_instruction(int instruction, int taille)
     }    
 	for (i=0;i<nb_instructions;i++){
         if (instructions[i].use){
-            res = instructions[i].code_op;
+            res = instructions[i];
         }
         instructions[i].use = 1;
 	}
@@ -44,7 +45,8 @@ decode_instruction(int instruction, int taille)
 
 void 
 load_instructions(const char *filename) {
-    FILE *file = fopen(filename, "r");
+    FILE * file = fopen(filename, "r");
+    int file2 = open("test.txt", O_WRONLY | O_CREAT | O_TRUNC);
     if (!file) {
         perror("Erreur ouverture fichier");
         exit(EXIT_FAILURE);
@@ -62,6 +64,8 @@ load_instructions(const char *filename) {
                 }
             }
         }
+        char * instruction = decode_instruction(values[0], 7).inst_ASM;
+        write(file2, instruction);
         if (indice == 0) {
             CPU.RI = values[0];
             CPU.adresse_latch = address;
@@ -75,9 +79,9 @@ void
 execute()
 {
     printf("Execute\n");
-    int instruction = decode_instruction(CPU.RI, 7);
+    instruction_t instruction = decode_instruction(CPU.RI, 7);
     while(CPU.RI != 0) {
-        switch(instruction) {
+        switch(instruction.code_op) {
             case 0b111:
                 SWP((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
                 next_instru();
@@ -162,6 +166,7 @@ execute()
     }
     printf("Execution terminée\n");
 }
+
 
 int 
 main(int argc, char *argv[]) {
