@@ -399,6 +399,7 @@ AND(uint8_t i, uint8_t j)
     Xin();
     SR(i);
     Rout();
+    Yin();
     CPU.alu.res = CPU.alu.X & CPU.alu.Y;
     ALUout();
     SR(i);
@@ -427,6 +428,7 @@ SWP(uint8_t i, uint8_t j)
     Rin();
     SR(i);
     RepX();
+    ALUout();
     Rin();
 }
 
