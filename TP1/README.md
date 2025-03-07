@@ -24,7 +24,7 @@ L'incrémenteur prend en entrée le contenu du registre $AddressLatch$ et prése
 - **D'un bloc gestion de la mémoire** : il comprend un registre de données $DLatch$ (pour Data Latch) codée sur 8 bits qui copie la valeur du bus de données interne sur le signal $DLin$, implémenté par `void DLin()`. Sur un signal $Read$, implémenté par `void Read()`, la mémoire met dans le registre $DLatch$ la valeur de la case mémoire d'adresse $AddressLatch$. Sur un signal $Write$, implémenté par `void Write()`, la mémoire copie dans la case mémoire d'adresse $AddressLatch$ l'information qui est dans $DLatch$. Lorsque la mémoire a terminé l'opération demandée ($Read$ ou $Write$), elle positionne en retour le signal $Ready$.
 
 ## Jeu d'instruction
-On souhaite que notre micro processeur dispose des instruction suivantes : 
+Notre micro processeur dispose des instruction suivantes : 
 - **JMP HHLL** : Effectue un branchement à l'adresse codée sur 16 bits
 - **JZ HHLL** : Effectue un saut à l'adresse 16 bit si l'opération précédente à donné un résultat nul
 - **JC HHLL** : Effectue un saut à l'adresse 16 bit si l'opération précédente à engendré une retenue
@@ -44,7 +44,7 @@ On souhaite que notre micro processeur dispose des instruction suivantes :
 
 ## Entrées / sorties du simulateur
 ### Entrées
-Le simulateur prendra en entrée un programme hexa comme suit : 
+Le simulateur prend en entrée un programme hexa comme suit : 
 ```
 0200: 51 06
 0202: 52 06
@@ -62,7 +62,7 @@ Le simulateur prendra en entrée un programme hexa comme suit :
 
 Sur chaque ligne du programme figure l'adresse mémoire du début de l'instruction suivie de l'instruction proprement dite.
 ### Sorties
-Le simulateur produira, en plus de l'exécution du programme, le fichier texte comportant le code assembleur équivalent au programme d'entrée.
+Le simulateur produit, en plus de l'exécution du programme, le fichier texte comportant le code assembleur équivalent au programme d'entrée.
 
 ## Exécution du programme
 L'archive contient un Makefile avec les commande suivante : 
