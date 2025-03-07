@@ -17,4 +17,4 @@ cpu.o: cpu.c cpu.h
 	$(CC) $(CFLAGS) -c cpu.c	
 
 clean:
-	rm -f $(OBJ) simulateur
+	rm -f $(OBJ) simulateur output.txt

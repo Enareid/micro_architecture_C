@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include "instructions.h"
 #include "cpu.h"
 #include "function.c"
@@ -63,6 +62,7 @@ load_instructions(const char *filename) {
                     CPU.RAM[address + i] = (unsigned char)values[i];
                 }
             }
+            
         }
         if (indice == 0) {
             CPU.RI = values[0];
@@ -166,41 +166,78 @@ execute()
     printf("Execution terminée\n");
 }
 
-void
-txt_to_s(const char *filename)
-{
-    char buf[20];
-    int indice;
-    FILE * file = fopen(filename, "r");
-    int file2 = open("test.txt", O_WRONLY | O_TRUNC);
-    if (!file) {
+void 
+txt_to_s(const char *filename) {
+    FILE *input_file = fopen(filename, "r");
+    if (!input_file) {
         perror("Erreur ouverture fichier");
-        fclose(file);
-        exit(EXIT_FAILURE);
+        return;
+    }
+    FILE *output_file = fopen("output.txt", "w");
+    if (!output_file) {
+        perror("Erreur ouverture fichier de sortie");
+        fclose(input_file);
+        return;
     }
     char line[256];
-    while (fgets(line, sizeof(line), file)) {
+    while (fgets(line, sizeof(line), input_file)) {
         unsigned int address;
         int values[3];
         int count = sscanf(line, "%x: %x %x %x", &address, &values[0], &values[1], &values[2]);
-        instruction_t inst = decode_instruction(values[0], 7);
-        char * instruction_char = inst.inst_ASM;
-        for (indice = 0; indice < strlen(instruction_char); indice ++) {
-            buf[indice] = instruction_char[indice];
+        if (count >= 2) {
+            unsigned int instruction = values[0];
+            int opcode = decode_instruction(instruction, 7).code_op;
+            switch (opcode) {
+                case 0b01010:
+                    fprintf(output_file, "MV R%d, %d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    break;
+                case 0b01011:
+                    fprintf(output_file, "DEC R%d\n", instruction & 0x07);
+                    break;
+                case 0b100:
+                    fprintf(output_file, "ADD R%d, R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    break;
+                case 0b111:
+                    fprintf(output_file, "SWP R%d, R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    break;
+                case 0b110:
+                    fprintf(output_file, "AND R%d, R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    break;
+                case 0b01100:
+                    fprintf(output_file, "INC R%d\n", instruction & 0x07);
+                    break;
+                case 0b01101:
+                    fprintf(output_file, "NOT R%d\n", instruction & 0x07);
+                    break;
+                case 0b01110000:
+                    fprintf(output_file, "JMP %02X%02X\n", values[1], values[2]);
+                    break;
+                case 0b01110001:
+                    fprintf(output_file, "JZ %02X%02X\n", values[1], values[2]);
+                    break;
+                case 0b01110010:
+                    fprintf(output_file, "JC %02X%02X\n", values[1], values[2]);
+                    break;
+                case 0b01110011:
+                    fprintf(output_file, "JMP RX%01X\n", values[1]);
+                    break;
+                case 0b011110:
+                    fprintf(output_file, "ST R%d\n", instruction & 0x07);
+                    break;
+                case 0b011111:
+                    fprintf(output_file, "LD R%d\n", instruction & 0x07);
+                    break;
+                case 0b01000:
+                    fprintf(output_file, "ST R%d, %02X%02X\n", instruction & 0x07, values[1], values[2]);
+                    break;
+                case 0b01001:
+                    fprintf(output_file, "LD R%d\n", instruction & 0x07);
+                    break;
+            }
         }
-        write(file2, buf, indice);
-        write(file2, " ", 1);
-        switch(inst.nb_operande) {
-            case 0:
-                break;
-            case 1:
-                switch(inst.type_op1) {
-                    sprintf(buf, "%d", values[1]); // Convert integer to string
-                    printf("%s\n", buf);
-                    break; 
-                }
-        }
-    }
+    }  
+    fclose(input_file);
+    fclose(output_file);
 }
 
 

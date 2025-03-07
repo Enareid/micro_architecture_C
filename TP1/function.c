@@ -160,6 +160,18 @@ next_addr()
 }
 
 void
+next_instru()
+{
+    PCout();
+    ALin();
+    Read();
+    AAout();
+    PCin();
+    DLout();
+    IRin();
+}
+
+void
 update_pc()
 {
     CPU.PC = (CPU.PCH << 8) | CPU.PCL;
@@ -430,16 +442,4 @@ SWP(uint8_t i, uint8_t j)
     RepX();
     ALUout();
     Rin();
-}
-
-void
-next_instru()
-{
-    PCout();
-    ALin();
-    Read();
-    AAout();
-    PCin();
-    DLout();
-    IRin();
 }
