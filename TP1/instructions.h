@@ -22,7 +22,7 @@ typedef struct instruction {
     int use;
 } instruction_t;
 
-extern instruction_t instructions[18];
+extern instruction_t instructions[17];
 
 
 #endif

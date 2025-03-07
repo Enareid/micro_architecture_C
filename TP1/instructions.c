@@ -1,6 +1,6 @@
 #include "instructions.h"
 
-instruction_t instructions[18] = {
+instruction_t instructions[17] = {
     {"NOP", 0b00000000, 8, 0, nul, 0, nul, 0, 1}, /* Ne fait rien */
     {"JMP", 0b01110000, 8, 1, adresse, 16, nul, 0, 1}, /* Effectue un branchement a l'adresse codée sur 16 bits */
     {"JZ", 0b01110001, 8, 1, adresse, 16, nul, 0, 1}, /* Effectue un saut a l'adresse 16 bit si l'opération précédente à donné un résultat nul */
@@ -18,7 +18,6 @@ instruction_t instructions[18] = {
     {"SUB", 0b101, 3, 2, reg, 2, reg, 3, 1}, /* Soustrait la valeur du reg Rm (deuxième opérande) à la valeur du reg Rn (premièer opérande) et stocke le résultat dans Rn*/
     {"AND", 0b110, 3, 2, reg, 2, reg, 3, 1}, /* Fait la conjonction bit à bit des deux regs et range le résultat dans le premier op (Rn codée sur 2 bits) */
     {"SWP", 0b111, 3, 2, reg, 2, reg, 3, 1}, /* Echange la valeur du reg Rn (premier opérande) au reg Rm (deuxième opérande) */
-    {"MV", 0b00, 2, 2, reg, 3, reg, 3, 1} /* Charge dans le reg Rn (premier opérande) la valeur du reg Rm (second opérande) */
 };
 
 
