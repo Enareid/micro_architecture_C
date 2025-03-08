@@ -177,12 +177,13 @@ txt_to_s(const char *filename) {
         perror("Erreur ouverture fichier");
         return;
     }
-    FILE *output_file = fopen("output.txt", "w");
+    FILE *output_file = fopen("output.s", "w");
     if (!output_file) {
         perror("Erreur ouverture fichier de sortie");
         fclose(input_file);
         return;
     }
+    fprintf(output_file,".data\n.text\n.globl _start\nstart:\n");
     char line[256];
     while (fgets(line, sizeof(line), input_file)) {
         unsigned int address;
@@ -193,52 +194,52 @@ txt_to_s(const char *filename) {
             int opcode = decode_instruction(instruction, 7).code_op;
             switch (opcode) {
                 case 0b111:
-                    fprintf(output_file, "SWP R%d, R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    fprintf(output_file, "swp %%r1%d, %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
                     break;
                 case 0b110:
-                    fprintf(output_file, "AND R%d, R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    fprintf(output_file, "and %%r1%d, %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
                     break;
                 case 0b101:
-                    fprintf(output_file, "SUB R%d; R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    fprintf(output_file, "sub %%r1%d; %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
                     break;
                 case 0b100:
-                    fprintf(output_file, "ADD R%d, R%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    fprintf(output_file, "add %%r1%d, %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
                     break;
                 case 0b01101:
-                    fprintf(output_file, "NOT R%d\n", instruction & 0x07);
+                    fprintf(output_file, "not %%r1%d\n", instruction & 0x07);
                     break;
                 case 0b01100:
-                    fprintf(output_file, "INC R%d\n", instruction & 0x07);
+                    fprintf(output_file, "inc %%r1%d\n", instruction & 0x07);
                     break;
                 case 0b01011:
-                    fprintf(output_file, "DEC R%d\n", instruction & 0x07);
+                    fprintf(output_file, "dec %%r1%d\n", instruction & 0x07);
                     break;
                 case 0b01010:
-                    fprintf(output_file, "MV R%d, %d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    fprintf(output_file, "mov $%d, %%r1%d\n", values[1], instruction & 0x07);
                     break;
                 case 0b01001:
-                    fprintf(output_file, "LD R%d\n", instruction & 0x07);
+                    fprintf(output_file, "ld R%d\n", instruction & 0x07);
                     break;
                 case 0b01000:
-                    fprintf(output_file, "ST R%d, %02X%02X\n", instruction & 0x07, values[1], values[2]);
+                    fprintf(output_file, "st %%r1%d, %02X%02X\n", instruction & 0x07, values[1], values[2]);
                     break;
                 case 0b011111:
-                    fprintf(output_file, "LD R%d\n", instruction & 0x07);
+                    fprintf(output_file, "ld R%d\n", instruction & 0x07);
                     break;
                 case 0b011110:
                     fprintf(output_file, "ST R%d\n", instruction & 0x07);
                     break;
                 case 0b01110011:
-                    fprintf(output_file, "JMP RX%01X\n", values[1]);
+                    fprintf(output_file, "jmp RX%01X\n", values[1]);
                     break;
                 case 0b01110010:
-                    fprintf(output_file, "JC %02X%02X\n", values[1], values[2]);
+                    fprintf(output_file, "jc %02X%02X\n", values[1], values[2]);
                     break;
                 case 0b01110001:
-                    fprintf(output_file, "JZ %02X%02X\n", values[1], values[2]);
+                    fprintf(output_file, "jz %02X%02X\n", values[1], values[2]);
                     break;
                 case 0b01110000:
-                    fprintf(output_file, "JMP %02X%02X\n", values[1], values[2]);
+                    fprintf(output_file, "jmp %02X%02X\n", values[1], values[2]);
                     break;
             }
         }
@@ -251,7 +252,7 @@ txt_to_s(const char *filename) {
 int 
 main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <fichier_instructions>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <fichier_instructions>\n [opt]", argv[0]);
         return EXIT_FAILURE;
     }
     switch(fork()){
