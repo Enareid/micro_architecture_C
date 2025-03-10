@@ -9,6 +9,8 @@
 #include "function.c"
 
 
+int nb_line = -1;
+
 instruction_t
 decode_instruction(int instruction, int taille)
 {
@@ -78,11 +80,12 @@ load_instructions(const char *filename) {
 }
 
 void
-execute()
+execute(int nb_instr)
 {
     int instruction = decode_instruction(CPU.RI, 7).code_op;
     fflush(stdout);
-    while(CPU.RI != 0) {
+    while(CPU.RI != 0 && nb_instr != 0) {
+        nb_instr--;
         switch(instruction) {
             case 0b111:
                 SWP((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
@@ -272,7 +275,7 @@ print_file(const char *filename) {
 void 
 run(const char *filename) {
     load_instructions(filename);
-    execute();
+    execute(nb_line);
 }
 
 void
@@ -297,6 +300,7 @@ info_register() {
 
 void
 debugger(const char *filename) {
+    load_instructions(filename);
     while(1) {
         printf("(db) : ");
         char cmd[256];
@@ -314,6 +318,9 @@ debugger(const char *filename) {
         }
         if (strcmp(cmd, "info register\n") == 0) {
             info_register();
+        }
+        if (strcmp(cmd, "step\n") == 0) {
+            execute(1);
         }
     }
 }
@@ -337,7 +344,7 @@ main(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
             case 0:
                 load_instructions(argv[1]);
-                execute();
+                execute(-1);
                 exit(EXIT_SUCCESS);
             default:
                 wait(NULL);
