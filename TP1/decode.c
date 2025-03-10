@@ -253,27 +253,65 @@ txt_to_s(const char *filename) {
     fclose(output_file);
 }
 
+void
+print_file(const char *filename) {
+    int count;
+    count = 1;
+    FILE *input_file = fopen(filename, "r");
+    if (!input_file) {
+        perror("Erreur ouverture fichier");
+        return;
+    }
+    char line[256];
+    while (fgets(line, sizeof(line), input_file)) {
+        printf("%d: %s",count, line);
+        count++;
+    }
+    printf("\n");
+    fclose(input_file);
+}
+
+void
+debugger(const char *filename) {
+    while(1) {
+        printf("(db) : ");
+        char cmd[256];
+        fgets(cmd, sizeof(cmd), stdin);
+        if (strcmp(cmd, "list\n") == 0) {
+            print_file(filename);
+        }
+    }
+}
+
 int 
 main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <fichier_instructions>\n [opt]", argv[0]);
         return EXIT_FAILURE;
     }
-    switch(fork()){
-        case -1:
-            perror("fork");
-            exit(EXIT_FAILURE);
-        case 0:
-            load_instructions(argv[1]);
-            printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
-            printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
-            execute();
-            printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
-            printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
-            break;
-        default:
-            txt_to_s(argv[1]);
-            wait(NULL);
+    if (argv[2] != NULL) {
+        if (strcmp(argv[2], "-d") == 0) {
+            debugger(argv[1]);
             exit(EXIT_SUCCESS);
+        }
+    }
+    else {
+        switch(fork()){
+            case -1:
+                perror("fork");
+                exit(EXIT_FAILURE);
+            case 0:
+                load_instructions(argv[1]);
+                printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
+                printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
+                execute();
+                printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
+                printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
+                break;
+            default:
+                txt_to_s(argv[1]);
+                wait(NULL);
+                exit(EXIT_SUCCESS);
+        }
     }
 }
