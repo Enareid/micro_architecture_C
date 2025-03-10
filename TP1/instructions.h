@@ -19,10 +19,6 @@ typedef struct instruction {
     uint8_t code_op;
     int taille_code_op;
     int nb_operande;
-    int type_op1;
-    int taille_op1;
-    int type_op2;
-    int taille_op2;
     int use;
     union Functions fonctions;
 } instruction_t;
