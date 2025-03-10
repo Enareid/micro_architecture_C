@@ -271,17 +271,27 @@ print_file(const char *filename) {
 
 void 
 run(const char *filename) {
-    switch(fork()){
-        case -1:
-            perror("fork");
-            exit(EXIT_FAILURE);
-        case 0:
-            load_instructions(filename);
-            execute();
-            exit(EXIT_SUCCESS);
-        default:
-            wait(NULL);
-            break;
+    load_instructions(filename);
+    execute();
+}
+
+void
+info_register() {
+    printf("PC: %04X\n", CPU.PC);
+    printf("PCH: %02X\n", CPU.PCH);
+    printf("PCL: %02X\n", CPU.PCL);
+    printf("RI: %02X\n", CPU.RI);
+    printf("ALL: %02X\n", CPU.ALL);
+    printf("ALH: %02X\n", CPU.ALH);
+    printf("Adresse bus: %04X\n", CPU.adresse_bus);
+    printf("Data bus: %02X\n", CPU.data_bus);
+    printf("DLatch: %02X\n", CPU.DLatch);
+    printf("X: %d\n", CPU.alu.X);
+    printf("Y: %d\n", CPU.alu.Y);
+    printf("Res: %d\n", CPU.alu.res);
+    printf("Flags: %02X\n", CPU.alu.flags);
+    for (int i = 0; i < NB_REGITRE; i++) {
+        printf("R%d: %d\n", i, CPU.registre.registre[i]);
     }
 }
 
@@ -302,6 +312,9 @@ debugger(const char *filename) {
             run(filename);
             printf("Program exited normally\n");
         }
+        if (strcmp(cmd, "info register\n") == 0) {
+            info_register();
+        }
     }
 }
 
@@ -318,6 +331,17 @@ main(int argc, char *argv[]) {
         }
     }
     else {
-        run(argv[1]);
+        switch(fork()){
+            case -1:
+                perror("fork");
+                exit(EXIT_FAILURE);
+            case 0:
+                load_instructions(argv[1]);
+                execute();
+                exit(EXIT_SUCCESS);
+            default:
+                wait(NULL);
+                break;
+        }
     }
 }
