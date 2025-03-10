@@ -9,6 +9,7 @@
 
 int nb_line = 0;
 int prev_break = 0;
+int step = 0;
 
 instruction_t
 decode_instruction(int instruction, int taille)
@@ -42,7 +43,9 @@ decode_instruction(int instruction, int taille)
         }
         instructions[i].use = 1;
 	}
-    next_addr();
+    if (step == 0) {
+        next_addr();
+    }
     return res;
 }
 
@@ -226,6 +229,14 @@ info_register() {
     }
 }
 
+void
+step_f(){
+    execute(1);
+    if (step != 0) {
+        next_addr();
+    }
+    step += 1;
+}
 
 
 void
@@ -250,7 +261,7 @@ debugger(const char *filename) {
             info_register();
         }
         if (strcmp(cmd, "step\n") == 0) {
-            execute(1);
+            step_f();
         }
         if (strstr(cmd, "break") != NULL) {
             sscanf(cmd, "break %d\n", &nb_line);
