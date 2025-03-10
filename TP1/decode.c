@@ -80,7 +80,6 @@ load_instructions(const char *filename) {
 void
 execute()
 {
-    printf("Execute\n");
     int instruction = decode_instruction(CPU.RI, 7).code_op;
     fflush(stdout);
     while(CPU.RI != 0) {
@@ -167,7 +166,6 @@ execute()
                 break;
         }
     }
-    printf("Execution terminée\n");
 }
 
 void 
@@ -271,14 +269,38 @@ print_file(const char *filename) {
     fclose(input_file);
 }
 
+void 
+run(const char *filename) {
+    switch(fork()){
+        case -1:
+            perror("fork");
+            exit(EXIT_FAILURE);
+        case 0:
+            load_instructions(filename);
+            execute();
+            exit(EXIT_SUCCESS);
+        default:
+            wait(NULL);
+            break;
+    }
+}
+
 void
 debugger(const char *filename) {
     while(1) {
         printf("(db) : ");
         char cmd[256];
         fgets(cmd, sizeof(cmd), stdin);
+        if (strcmp(cmd, "quit\n") == 0) {
+            exit(EXIT_SUCCESS);
+        }
         if (strcmp(cmd, "list\n") == 0) {
             print_file(filename);
+        }
+        if (strcmp(cmd, "run\n") == 0) {
+            printf("Starting program\n");
+            run(filename);
+            printf("Program exited normally\n");
         }
     }
 }
@@ -296,22 +318,6 @@ main(int argc, char *argv[]) {
         }
     }
     else {
-        switch(fork()){
-            case -1:
-                perror("fork");
-                exit(EXIT_FAILURE);
-            case 0:
-                load_instructions(argv[1]);
-                printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
-                printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
-                execute();
-                printf("valeur registre 1 : %d\n", CPU.registre.registre[1]);
-                printf("valeur registre 2 : %d\n", CPU.registre.registre[2]);
-                break;
-            default:
-                txt_to_s(argv[1]);
-                wait(NULL);
-                exit(EXIT_SUCCESS);
-        }
+        run(argv[1]);
     }
 }
