@@ -9,7 +9,8 @@
 #include "function.c"
 
 
-int nb_line = -1;
+int nb_line = 0;
+int nb_break = 0;
 
 instruction_t
 decode_instruction(int instruction, int taille)
@@ -275,7 +276,8 @@ print_file(const char *filename) {
 void 
 run(const char *filename) {
     load_instructions(filename);
-    execute(nb_line);
+    execute(nb_line - 1);
+    nb_line = 0;
 }
 
 void
@@ -297,6 +299,8 @@ info_register() {
         printf("R%d: %d\n", i, CPU.registre.registre[i]);
     }
 }
+
+
 
 void
 debugger(const char *filename) {
@@ -321,6 +325,11 @@ debugger(const char *filename) {
         }
         if (strcmp(cmd, "step\n") == 0) {
             execute(1);
+        }
+        if (strstr(cmd, "break") != NULL) {
+            sscanf(cmd, "break %d\n", &nb_line);
+            nb_break++;
+            printf("Breakpoint %d set at line %d\n", nb_break, nb_line);
         }
     }
 }
