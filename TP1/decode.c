@@ -6,11 +6,9 @@
 #include <sys/wait.h>
 #include "instructions.h"
 #include "cpu.h"
-#include "function.c"
-
 
 int nb_line = 0;
-int nb_break = 0;
+int prev_break = 0;
 
 instruction_t
 decode_instruction(int instruction, int taille)
@@ -83,92 +81,20 @@ load_instructions(const char *filename) {
 void
 execute(int nb_instr)
 {
-    int instruction = decode_instruction(CPU.RI, 7).code_op;
-    fflush(stdout);
+    instruction_t instruction = decode_instruction(CPU.RI, 7);
     while(CPU.RI != 0 && nb_instr != 0) {
         nb_instr--;
-        switch(instruction) {
-            case 0b111:
-                SWP((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b110:
-                AND((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b101:
-                SUB((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b100:
-                ADD((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01101:
-                NOT(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01100:
-                INC(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01011:
-                DEC(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01010:
-                MV(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01001:
-                LD(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01000:
-                ST(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b011111:
-                LD2(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b011110:
-                ST2(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01110011:
-                JMP2(CPU.RI & 0x07);
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01110010:
-                JC();
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01110001:
-                JZ();
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
-            case 0b01110000:
-                JMP();
-                next_instru();
-                instruction = decode_instruction(CPU.RI, 7).code_op;
-                break;
+        if (instruction.nb_operande == 0) {
+            instruction.fonctions.fonction();
         }
+        if (instruction.nb_operande == 1) {
+            instruction.fonctions.fonction1(CPU.RI & 0x07);
+        }
+        if (instruction.nb_operande == 2) {
+            instruction.fonctions.fonction2((CPU.RI >> 3) && 0x07, CPU.RI & 0x07);
+        }
+        next_instru();
+        instruction = decode_instruction(CPU.RI, 7);
     }
 }
 
@@ -328,8 +254,11 @@ debugger(const char *filename) {
         }
         if (strstr(cmd, "break") != NULL) {
             sscanf(cmd, "break %d\n", &nb_line);
-            nb_break++;
-            printf("Breakpoint %d set at line %d\n", nb_break, nb_line);
+            if(nb_line < prev_break) {
+                nb_line += prev_break;
+            }
+            prev_break = nb_line;
+            printf("Breakpoint set at line %d\n", nb_line);
         }
     }
 }

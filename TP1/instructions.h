@@ -1,14 +1,18 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
+
+#include <stdint.h>
 
 #define nul 0
 #define adresse 1
 #define reg 2
 #define valeur 3
+
+union Functions {
+    void (*fonction)(void);
+    void (*fonction1)(uint8_t);
+    void (*fonction2)(uint8_t, uint8_t);
+};
 
 typedef struct instruction {
     char * inst_ASM;
@@ -20,7 +24,9 @@ typedef struct instruction {
     int type_op2;
     int taille_op2;
     int use;
+    union Functions fonctions;
 } instruction_t;
+
 
 extern instruction_t instructions[17];
 

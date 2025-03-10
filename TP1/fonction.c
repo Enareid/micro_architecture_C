@@ -1,3 +1,6 @@
+#ifndef FONTION_H
+#define FONTION_H
+
 #include "cpu.h"
 
 void 
@@ -182,6 +185,10 @@ update_al()
 {
     CPU.adresse_latch = (CPU.ALL << 8) | CPU.ALH;
 }
+
+void
+NOP()
+{} // Ne fait rien
 
 void
 JMP()
@@ -419,16 +426,6 @@ AND(uint8_t i, uint8_t j)
 }
 
 void
-MV2(uint8_t i, uint8_t j)
-{
-    SR(j);
-    Rout();
-    Xin();
-    SR(i);
-    Rin();
-}
-
-void
 SWP(uint8_t i, uint8_t j)
 {
     SR(j);
@@ -443,3 +440,5 @@ SWP(uint8_t i, uint8_t j)
     ALUout();
     Rin();
 }
+
+#endif

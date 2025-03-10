@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-OBJ = decode.o instructions.o cpu.o
+OBJ = decode.o instructions.o cpu.o 
 
 all: simulateur
 
