@@ -183,18 +183,22 @@ txt_to_s(const char *filename) {
         fclose(input_file);
         return;
     }
-    fprintf(output_file,".data\n.text\n.globl _start\nstart:\n");
+    fprintf(output_file,".data\nres: .quad 0\n.text\n.globl _start\n_start:\n");
     char line[256];
     while (fgets(line, sizeof(line), input_file)) {
         unsigned int address;
         int values[3];
         int count = sscanf(line, "%x: %x %x %x", &address, &values[0], &values[1], &values[2]);
+        fprintf(output_file, "label_%04X:\n ", address);
         if (count >= 2) {
             unsigned int instruction = values[0];
             int opcode = decode_instruction(instruction, 7).code_op;
             switch (opcode) {
+                case 0b00000000:
+                    fprintf(output_file, "nop\n");
+                    break;
                 case 0b111:
-                    fprintf(output_file, "swp %%r1%d, %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
+                    fprintf(output_file, "xchg %%r1%d, %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
                     break;
                 case 0b110:
                     fprintf(output_file, "and %%r1%d, %%r1%d\n", (instruction >> 3) & 0x07, instruction & 0x07);
@@ -218,10 +222,10 @@ txt_to_s(const char *filename) {
                     fprintf(output_file, "mov $%d, %%r1%d\n", values[1], instruction & 0x07);
                     break;
                 case 0b01001:
-                    fprintf(output_file, "ld R%d\n", instruction & 0x07);
+                    fprintf(output_file, "ld %%r%d\n", instruction & 0x07);
                     break;
                 case 0b01000:
-                    fprintf(output_file, "st %%r1%d, %02X%02X\n", instruction & 0x07, values[1], values[2]);
+                    fprintf(output_file, "mov %%r1%d, res(%%rip)\n", instruction & 0x07);
                     break;
                 case 0b011111:
                     fprintf(output_file, "ld R%d\n", instruction & 0x07);
@@ -233,21 +237,21 @@ txt_to_s(const char *filename) {
                     fprintf(output_file, "jmp RX%01X\n", values[1]);
                     break;
                 case 0b01110010:
-                    fprintf(output_file, "jc %02X%02X\n", values[1], values[2]);
+                    fprintf(output_file, "jc label_%02X%02X\n", values[1], values[2]);
                     break;
                 case 0b01110001:
-                    fprintf(output_file, "jz %02X%02X\n", values[1], values[2]);
+                    fprintf(output_file, "jz label_%02X%02X\n", values[1], values[2]);
                     break;
                 case 0b01110000:
-                    fprintf(output_file, "jmp %02X%02X\n", values[1], values[2]);
+                    fprintf(output_file, "jmp label_%02X%02X\n", values[1], values[2]);
                     break;
             }
         }
     }  
+    fprintf(output_file, "exit:\nmov $60, %%rax\nmov $0, %%rdi\nsyscall\n");
     fclose(input_file);
     fclose(output_file);
 }
-
 
 int 
 main(int argc, char *argv[]) {

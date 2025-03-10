@@ -4,7 +4,7 @@ OBJ = decode.o instructions.o cpu.o
 
 all: simulateur
 
-assembly: output
+asm: output
 
 simulateur: $(OBJ)
 	$(CC) $(CFLAGS) -o simulateur $(OBJ)
@@ -25,4 +25,4 @@ output: output.o
 	ld -o output output.o
 
 clean:
-	rm -f $(OBJ) simulateur output.*
+	rm -f $(OBJ) simulateur output*
