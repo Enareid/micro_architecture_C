@@ -162,7 +162,7 @@ txt_to_s(const char *filename) {
                     fprintf(output_file, "ld R%d\n", instruction & 0x07);
                     break;
                 case 0b011110:
-                    fprintf(output_file, "ST R%d\n", instruction & 0x07);
+                    fprintf(output_file, "st $$r%d\n", instruction & 0x07);
                     break;
                 case 0b01110011:
                     fprintf(output_file, "jmp RX%01X\n", values[1]);
