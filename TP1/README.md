@@ -64,6 +64,15 @@ Sur chaque ligne du programme figure l'adresse mémoire du début de l'instructi
 ### Sorties
 Le simulateur produit, en plus de l'exécution du programme, le fichier texte comportant le code assembleur équivalent au programme d'entrée.
 
+## Debugger
+Le simulateur comprend un débugger qui offre les possibilitées suivantes : 
+- `quit` : permet de quitter le debugger
+- `run`  : permet d'exécuter le programme
+- `step` : permet d'exécuter une seule ligne du programme
+- `info register` : permet d'afficher tout les registres
+- `break n` : permet de mettre un point d'arrêt a la ligne n
+- `list` : permet d'afficher chaque ligne du programme
+
 ## Exécution du programme
 L'archive contient un Makefile avec les commande suivante : 
 - **make** : compile tous les fichier nécessaire et crée le fichier exécutable `simulateur`
@@ -71,3 +80,5 @@ L'archive contient un Makefile avec les commande suivante :
 
 L'archive contient aussi deux programme, programme.txt et programme2.txt.
 Le simulateur est donc exécutable grace a cette commande : `./simulateur <fichier_instructions>`
+
+Pour lancer le debugger il faut utiliser la commande : `./simulateur <fichier_instructions> -d`
