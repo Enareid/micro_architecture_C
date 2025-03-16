@@ -1,5 +1,5 @@
 #### Author
-Proy Cyril
+P. C.
 
 Boudier Stéphane
 
