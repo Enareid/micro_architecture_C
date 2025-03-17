@@ -280,11 +280,12 @@ main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <fichier_instructions>\n [opt]", argv[0]);
         return EXIT_FAILURE;
     }
-    if (argv[2] != NULL) {
+    if (argc > 2) {
         if (strcmp(argv[2], "-d") == 0) {
             debugger(argv[1]);
             exit(EXIT_SUCCESS);
         }
+        exit(EXIT_FAILURE);
     }
     else {
         switch(fork()){
@@ -297,7 +298,8 @@ main(int argc, char *argv[]) {
                 exit(EXIT_SUCCESS);
             default:
                 wait(NULL);
-                break;
+                txt_to_s(argv[1]);
+                exit(EXIT_SUCCESS);
         }
     }
 }
